@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>CRUD Table</title>
+  <style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th, td {
+    border: 1px solid black;
+    padding: 8px;
+    text-align: left;
+  }
+
+  form {
+    margin-bottom: 10px;
+  }
+
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    padding: 6px;
+    box-sizing: border-box;
+  }
+
+  button {
+    padding: 6px 12px;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fadeInForm {
+    from {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+
+  h1 {
+    animation: fadeIn 1s ease;
+  }
+
+  #form {
+    animation: fadeInForm 1s ease;
+  }
+
+  #table {
+    animation: slideIn 1s ease;
+  }
+</style>
+
+</head>
+<body>
+  <h1>CRUD Table</h1>
+
+  <form id="form">
+    <label for="name">Name:</label>
+    <input type="text" id="name" required>
+    <label for="email">Email:</label>
+    <input type="email" id="email" required>
+    <button type="button" onclick="addRow()">Add</button>
+  </form>
+
+  <table id="table">
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Action</th>
+    </tr>
+  </table>
+
+  <script>
+      
+const data = JSON.parse(localStorage.getItem("tableData")) || [];
+
+function renderTable() {
+  const table = document.getElementById("table");
+  table.innerHTML = `
+    <tr>
+      <th>Name</th>
+      <th>Email</th>
+      <th>Action</th>
+    </tr>
+  `;
+
+  data.forEach((item) => {
+    const row = table.insertRow();
+    row.innerHTML = `
+      <td>${item.name}</td>
+      <td>${item.email}</td>
+      <td>
+        <button onclick="editRow(this)">Edit</button>
+        <button onclick="deleteRow(this)">Delete</button>
+      </td>
+    `;
+  });
+}
+
+function addRow() {
+  const name = document.getElementById("name").value;
+  const email = document.getElementById("email").value;
+
+  if (name && email) {
+    data.push({ name, email });
+    localStorage.setItem("tableData", JSON.stringify(data));
+
+    document.getElementById("name").value = "";
+    document.getElementById("email").value = "";
+
+    renderTable();
+  }
+}
+
+function editRow(button) {
+  const row = button.parentNode.parentNode;
+  const name = row.cells[0].innerHTML;
+  const email = row.cells[1].innerHTML;
+
+  document.getElementById("name").value = name;
+  document.getElementById("email").value = email;
+
+  row.remove();
+  data = data.filter((item) => item.name !== name && item.email !== email);
+  localStorage.setItem("tableData", JSON.stringify(data));
+}
+
+function deleteRow(button) {
+  const row = button.parentNode.parentNode;
+  const name = row.cells[0].innerHTML;
+  const email = row.cells[1].innerHTML;
+
+  row.remove();
+  data = data.filter((item) => item.name !== name && item.email !== email);
+  localStorage.setItem("tableData", JSON.stringify(data));
+}
+
+renderTable();
+
+  </script>
+</body>
+</html>
